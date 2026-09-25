@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOSMO — Estudio Creativo de Espacios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+  @font-face{font-family:'Systemia';src:url('assets/SystemiaTest-Regular.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap;}
+  @font-face{font-family:'Systemia';src:url('assets/SystemiaTest-Medium.otf') format('opentype');font-weight:500;font-style:normal;font-display:swap;}
+  @font-face{font-family:'Systemia';src:url('assets/SystemiaTest-Bold.otf') format('opentype');font-weight:700;font-style:normal;font-display:swap;}
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #1a1a18; --paper: #f5f2ec; --accent: #c8b89a;
+    --soft: #e8e4db; --muted: #8a8478; --white: #faf8f4;
+    /* tema oscuro — Rental */
+    --dk-bg: #0d0d0c; --dk-ink: #f5f2ec; --dk-muted: rgba(245,242,236,0.55);
+    --dk-border: rgba(245,242,236,0.14); --dk-panel: rgba(245,242,236,0.045);
+    --c-rental: #e14a30; --c-proyectos: #c9b79c; --c-nosotros: #f5f2ec; --c-contacto: #8fc7de;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Mono', monospace; background: var(--paper); color: var(--ink); overflow-x: hidden; transition:background 0.5s ease, color 0.5s ease; }
+  body.theme-dark {
+    background-color: var(--dk-bg);
+    background-image: url('assets/fondo-web.jpg');
+    background-size: 130% auto;
+    background-position: center 30%;
+    background-repeat: no-repeat;
+    color: var(--dk-ink);
+    animation: bgdrift 50s ease-in-out infinite alternate;
+  }
+  body.theme-dark::after {
+    content:''; position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.55));
+  }
+  @keyframes bgdrift { from{background-position:center 25%;} to{background-position:center 38%;} }
+
+  /* NAV */
+  nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 3rem; background:var(--paper); border-bottom:1px solid var(--soft); transition:background 0.4s ease, border-color 0.4s ease; }
+  .nav-logo { text-decoration:none; display:flex; align-items:center; }
+  .nav-logo-img { height:2.5rem; width:auto; display:block; filter:invert(1); transition:filter 0.4s ease; }
+  .nav-links { display:flex; gap:2.5rem; list-style:none; }
+  .nav-links a { font-family:'Systemia',sans-serif; font-weight:500; font-size:0.68rem; letter-spacing:0.18em; text-transform:uppercase; text-decoration:none; color:var(--muted); transition:color 0.35s ease, opacity 0.35s ease, transform 0.2s ease; position:relative; display:inline-block; }
+  .nav-links a:hover { color:var(--ink); transform:translateY(-1px); }
+
+  /* NAV — tema oscuro (activo en Rental) */
+  body.theme-dark nav { background:transparent; border-bottom-color:var(--dk-border); }
+  body.theme-dark .nav-logo-img { filter:invert(0); }
+  body.theme-dark .nav-links a { color:var(--dk-nav-color,var(--dk-ink)); opacity:0.55; }
+  body.theme-dark .nav-links a:hover { opacity:1; }
+  body.theme-dark .nav-links li:nth-child(1) a { --dk-nav-color:var(--c-rental); }
+  body.theme-dark .nav-links li:nth-child(2) a { --dk-nav-color:var(--c-proyectos); }
+  body.theme-dark .nav-links li:nth-child(3) a { --dk-nav-color:var(--c-nosotros); }
+  body.theme-dark .nav-links li:nth-child(4) a { --dk-nav-color:var(--c-contacto); }
+  body.theme-dark .nav-links a.nav-active { opacity:1; font-weight:700; }
+  body.theme-dark .nav-links a.nav-active::after {
+    content:''; position:absolute; left:0; right:0; bottom:-0.5rem; height:2px; background:var(--dk-nav-color);
+    animation: navpulse 2.4s ease-in-out infinite;
+  }
+  @keyframes navpulse { 0%,100%{opacity:0.4;transform:scaleX(0.7);} 50%{opacity:1;transform:scaleX(1);} }
+
+  /* PAGES */
+  .page { display:none; min-height:100vh; padding:7rem 3rem 4rem; position:relative; z-index:2; }
+  .page.active { display:block; }
+  .breadcrumb { font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); cursor:pointer; display:inline-block; margin-bottom:2rem; }
+  .breadcrumb:hover { color:var(--ink); }
+
+  /* HOME */
+  .hero { min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:8rem 3rem 4rem; }
+  .hero-title { font-family:'Cormorant Garamond',serif; font-size:clamp(3rem,8vw,7rem); font-weight:300; line-height:1; letter-spacing:-0.02em; margin-bottom:1rem; }
+  .hero-title em { font-style:italic; color:var(--muted); }
+  .hero-sub { font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:5rem; }
+  .hero-cards { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; max-width:900px; }
+  .hero-card { border:1px solid var(--ink); padding:3rem 2.5rem; cursor:pointer; text-decoration:none; color:var(--ink); position:relative; overflow:hidden; background:var(--white); }
+  .hero-card::before { content:''; position:absolute; inset:0; background:var(--ink); transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.76,0,0.24,1); z-index:0; }
+  .hero-card:hover::before { transform:translateY(0); }
+  .hero-card:hover .card-title, .hero-card:hover .card-desc, .hero-card:hover .card-cta { color:var(--paper); }
+  .card-tag { font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; color:var(--muted); margin-bottom:1.5rem; position:relative; z-index:1; transition:color 0.3s; }
+  .hero-card:hover .card-tag { color:var(--accent); }
+  .card-title { font-family:'Cormorant Garamond',serif; font-size:2.2rem; font-weight:300; line-height:1.1; margin-bottom:1rem; position:relative; z-index:1; transition:color 0.3s; }
+  .card-desc { font-size:0.65rem; line-height:1.8; color:var(--muted); margin-bottom:2rem; position:relative; z-index:1; transition:color 0.3s; }
+  .card-cta { font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; position:relative; z-index:1; transition:color 0.3s; display:flex; align-items:center; gap:0.5rem; }
+  .card-cta::after { content:'→'; transition:transform 0.2s; }
+  .hero-card:hover .card-cta::after { transform:translateX(4px); }
+
+  /* ABOUT */
+  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:6rem; max-width:1000px; margin:4rem 0; }
+  .about-text h2 { font-family:'Cormorant Garamond',serif; font-size:3rem; font-weight:300; margin-bottom:2rem; line-height:1.1; }
+  .about-text p { font-size:0.7rem; line-height:2; color:var(--muted); margin-bottom:1.5rem; }
+  .about-clients h3 { font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:2rem; }
+  .client-list { list-style:none; display:flex; flex-direction:column; gap:0.8rem; }
+  .client-list li { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:300; border-bottom:1px solid var(--soft); padding-bottom:0.8rem; color:var(--muted); }
+
+  /* AMBIENTACION */
+  .ambientacion-hero { max-width:700px; margin-bottom:5rem; }
+  .ambientacion-hero h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(2.5rem,5vw,4.5rem); font-weight:300; line-height:1.05; margin-bottom:1.5rem; }
+  .ambientacion-hero p { font-size:0.7rem; line-height:2; color:var(--muted); }
+  .trabajos-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; margin-bottom:5rem; }
+  .trabajo-card { border:1px solid var(--soft); padding:2rem; background:var(--white); }
+  .trabajo-cliente { font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:0.5rem; }
+  .trabajo-card h3 { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:300; margin-bottom:0.8rem; }
+  .trabajo-card p { font-size:0.62rem; line-height:1.8; color:var(--muted); }
+  .contacto-bloque { border:1px solid var(--ink); padding:3rem; max-width:600px; background:var(--white); }
+  .contacto-bloque h3 { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:300; margin-bottom:1rem; }
+  .contacto-bloque p { font-size:0.65rem; line-height:1.8; color:var(--muted); margin-bottom:2rem; }
+
+  /* RENTAL — layout con sidebar */
+  #page-rental { padding-top:6.5rem; }
+  .rental-back { font-family:'Systemia',sans-serif; font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--dk-muted); cursor:pointer; display:inline-block; margin-bottom:1.8rem; transition:color 0.2s; }
+  .rental-back:hover { color:var(--dk-ink); }
+  .rental-layout { display:grid; grid-template-columns:250px 1fr; gap:3rem; align-items:start; }
+  .rental-sidebar { display:flex; flex-direction:column; gap:2.2rem; position:sticky; top:8rem; }
+  .search-input { font-family:'Systemia',sans-serif; font-size:0.68rem; letter-spacing:0.02em; border:1px solid var(--dk-border); background:transparent; padding:0.75rem 1rem; width:100%; outline:none; color:var(--dk-ink); transition:border-color 0.2s; }
+  .search-input:focus { border-color:var(--c-rental); }
+  .search-input::placeholder { color:var(--dk-muted); }
+  .cat-list { display:flex; flex-direction:column; gap:1.05rem; }
+  .filter-btn { font-family:'Systemia',sans-serif; font-size:0.85rem; text-align:left; border:none; background:transparent; padding:0; cursor:pointer; color:var(--dk-muted); transition:color 0.25s ease, transform 0.25s ease; }
+  .filter-btn:hover { color:var(--dk-ink); transform:translateX(4px); }
+  .filter-btn.active { color:var(--c-rental); font-weight:500; transform:translateX(4px); }
+  .k-mark { width:44px; height:auto; opacity:0.85; margin-top:0.5rem; animation:kspin 26s linear infinite; }
+  @keyframes kspin { to { transform:rotate(360deg); } }
+
+  /* CATALOG GRID */
+  .catalog-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:1.5rem; margin-bottom:3rem; }
+  .item-card { background:var(--dk-panel); border:1px solid var(--dk-border); transition:all 0.25s; position:relative; backdrop-filter:blur(2px); }
+  .item-card:hover { border-color:var(--dk-ink); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.35); }
+  .item-card.selected { border-color:var(--c-rental); background:rgba(225,74,48,0.12); }
+  .item-card.selected .item-name, .item-card.selected .item-price, .item-card.selected .item-cat { color:var(--dk-ink); }
+
+  .item-img-wrap { position:relative; overflow:hidden; cursor:pointer; }
+  .item-img-actions { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:0.6rem; background:rgba(0,0,0,0.5); opacity:0; transition:opacity 0.2s; }
+  .item-img-wrap:hover .item-img-actions { opacity:1; }
+  .iab { width:38px; height:38px; border-radius:50%; border:none; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; transition:transform 0.15s; }
+  .iab:hover { transform:scale(1.1); }
+  .iab-zoom { background:var(--dk-ink); color:var(--dk-bg); }
+  .iab-add { background:var(--c-rental); color:var(--dk-ink); font-size:1.2rem; font-weight:bold; }
+  .iab-add.added { background:var(--dk-ink); color:var(--dk-bg); }
+
+  .item-img { width:100%; aspect-ratio:1; object-fit:cover; display:block; background:var(--dk-panel); }
+  .item-no-photo { width:100%; aspect-ratio:1; background:var(--dk-panel); display:flex; align-items:center; justify-content:center; font-size:0.55rem; letter-spacing:0.1em; color:var(--dk-muted); text-transform:uppercase; }
+  .item-info { padding:1rem; cursor:pointer; }
+  .item-cat { font-family:'Systemia',sans-serif; font-size:0.55rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--dk-muted); margin-bottom:0.3rem; transition:color 0.2s; }
+  .item-name { font-family:'Systemia',sans-serif; font-weight:500; font-size:1rem; line-height:1.3; margin-bottom:0.5rem; transition:color 0.2s; color:var(--dk-ink); }
+  .item-price { font-family:'Systemia',sans-serif; font-size:0.65rem; color:var(--dk-muted); transition:color 0.2s; }
+  #page-rental .loading, #page-rental .no-results { font-family:'Systemia',sans-serif; color:var(--dk-muted); }
+  #page-rental footer { border-top-color:var(--dk-border); }
+  #page-rental footer span, #page-rental footer a { color:var(--dk-muted); }
+
+  @media(max-width:900px){
+    .rental-layout{grid-template-columns:1fr;}
+    .rental-sidebar{position:static;flex-direction:row;flex-wrap:wrap;align-items:center;}
+    .cat-list{flex-direction:row;flex-wrap:wrap;gap:0.5rem 1.2rem;}
+    .search-input{width:100%;}
+    .k-mark{display:none;}
+  }
+
+  /* LIGHTBOX */
+  .lightbox { position:fixed; inset:0; background:rgba(8,8,6,0.93); z-index:300; display:none; align-items:center; justify-content:center; padding:1.5rem; }
+  .lightbox.open { display:flex; }
+  .lb-inner { position:relative; width:100%; max-width:820px; background:var(--paper); }
+  .lb-close { position:absolute; top:-2.2rem; right:0; background:none; border:none; color:var(--paper); font-size:1.5rem; cursor:pointer; line-height:1; }
+  .lb-img-area { position:relative; background:#111; aspect-ratio:4/3; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+  .lb-img-area img { max-width:100%; max-height:100%; object-fit:contain; display:block; }
+  .lb-nav { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.85); border:none; width:38px; height:38px; font-size:1.2rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s; }
+  .lb-nav:hover { background:var(--white); }
+  .lb-nav.prev { left:0.6rem; }
+  .lb-nav.next { right:0.6rem; }
+  .lb-thumbs { display:flex; gap:0.4rem; padding:0.7rem 1rem; background:var(--soft); overflow-x:auto; }
+  .lb-thumb { width:56px; height:56px; object-fit:cover; cursor:pointer; border:2px solid transparent; opacity:0.55; flex-shrink:0; transition:all 0.2s; }
+  .lb-thumb.active { border-color:var(--ink); opacity:1; }
+  .lb-info { padding:1.2rem 1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-top:1px solid var(--soft); }
+  .lb-name { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:300; }
+  .lb-meta { font-size:0.6rem; color:var(--muted); margin-top:0.3rem; line-height:1.7; }
+  .lb-price { font-family:'Cormorant Garamond',serif; font-size:1.6rem; font-weight:300; white-space:nowrap; }
+  .lb-add-btn { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; border:1px solid var(--ink); background:transparent; color:var(--ink); padding:0.6rem 1.2rem; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .lb-add-btn:hover, .lb-add-btn.added { background:var(--ink); color:var(--paper); }
+
+  /* PRESUPUESTO BAR */
+  .pbar { position:fixed; bottom:0; left:0; right:0; background:var(--ink); color:var(--paper); padding:1rem 3rem; display:flex; justify-content:space-between; align-items:center; transform:translateY(100%); transition:transform 0.4s cubic-bezier(0.76,0,0.24,1); z-index:99; }
+  .pbar.visible { transform:translateY(0); }
+  .pbar-info { display:flex; align-items:center; gap:2rem; }
+  .pbar-count { font-size:0.65rem; letter-spacing:0.1em; }
+  .pbar-total { font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:300; }
+  .pbar-actions { display:flex; gap:1rem; align-items:center; }
+  .btn-clear { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; background:transparent; border:1px solid rgba(255,255,255,0.3); color:var(--paper); padding:0.5rem 1rem; cursor:pointer; transition:border-color 0.2s; }
+  .btn-clear:hover { border-color:var(--paper); }
+  .btn-ver-ppto { font-family:'DM Mono',monospace; font-size:0.6rem; letter-spacing:0.1em; text-transform:uppercase; background:var(--accent); border:none; color:var(--ink); padding:0.7rem 1.5rem; cursor:pointer; transition:background 0.2s; }
+  .btn-ver-ppto:hover { background:var(--paper); }
+
+  /* MODAL */
+  .overlay { position:fixed; inset:0; background:rgba(26,26,24,0.72); z-index:200; display:none; align-items:center; justify-content:center; padding:2rem; }
+  .overlay.open { display:flex; }
+  .modal { background:var(--paper); border:1px solid var(--ink); width:100%; max-width:600px; max-height:90vh; overflow-y:auto; padding:3rem; position:relative; }
+  .modal h2 { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:300; margin-bottom:0.5rem; }
+  .modal-sub { font-size:0.62rem; color:var(--muted); margin-bottom:2rem; line-height:1.8; }
+  .modal-items { border-top:1px solid var(--soft); margin-bottom:1.5rem; }
+  .modal-row { display:flex; justify-content:space-between; align-items:center; padding:0.75rem 0; border-bottom:1px solid var(--soft); gap:1rem; }
+  .modal-row-name { font-family:'Cormorant Garamond',serif; font-size:1rem; flex:1; }
+  .modal-row-price { font-size:0.65rem; color:var(--muted); white-space:nowrap; }
+  .modal-row-rm { background:none; border:none; cursor:pointer; color:var(--muted); font-size:0.9rem; padding:0.2rem; transition:color 0.2s; }
+  .modal-row-rm:hover { color:var(--ink); }
+  .modal-total-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.4rem; }
+  .modal-total-label { font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); }
+  .modal-total-num { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:300; }
+  .modal-note { font-size:0.6rem; color:var(--muted); margin-bottom:2rem; line-height:1.8; }
+  .fg { margin-bottom:1.1rem; }
+  .fg label { display:block; font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:0.35rem; }
+  .fg input, .fg textarea { width:100%; font-family:'DM Mono',monospace; font-size:0.7rem; border:1px solid var(--soft); background:var(--white); padding:0.7rem 0.8rem; outline:none; color:var(--ink); transition:border-color 0.2s; resize:vertical; }
+  .fg input:focus, .fg textarea:focus { border-color:var(--ink); }
+  .frow { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .btn-send { width:100%; font-family:'DM Mono',monospace; font-size:0.65rem; letter-spacing:0.15em; text-transform:uppercase; background:var(--ink); border:none; color:var(--paper); padding:1rem; cursor:pointer; transition:background 0.2s; margin-top:0.5rem; }
+  .btn-send:hover { background:#2d2d2a; }
+  .btn-send:disabled { background:var(--muted); cursor:not-allowed; }
+  .modal-close { position:absolute; top:1.4rem; right:1.4rem; background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--muted); }
+  .send-ok { text-align:center; padding:2rem 0; }
+  .send-ok h3 { font-family:'Cormorant Garamond',serif; font-size:2rem; font-weight:300; margin-bottom:1rem; }
+  .send-ok p { font-size:0.65rem; color:var(--muted); line-height:2; }
+
+  /* CONTACTO */
+  .ctc-grid { display:grid; grid-template-columns:1fr 1fr; gap:6rem; max-width:900px; margin-top:3rem; }
+  .ctc-info h2 { font-family:'Cormorant Garamond',serif; font-size:3rem; font-weight:300; margin-bottom:2rem; line-height:1.1; }
+  .ctc-info p { font-size:0.65rem; line-height:2; color:var(--muted); margin-bottom:1rem; }
+  .ctc-links { display:flex; flex-direction:column; gap:1rem; margin-top:2rem; }
+  .ctc-links a { font-size:0.65rem; color:var(--muted); text-decoration:none; display:flex; align-items:center; gap:0.8rem; transition:color 0.2s; }
+  .ctc-links a:hover { color:var(--ink); }
+
+  .loading { display:flex; align-items:center; justify-content:center; padding:5rem; font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); }
+  .no-results { text-align:center; padding:5rem; font-size:0.65rem; color:var(--muted); }
+  .btn { display:inline-block; font-family:'DM Mono',monospace; font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; text-decoration:none; border:1px solid var(--ink); padding:0.8rem 1.8rem; color:var(--ink); background:transparent; cursor:pointer; transition:all 0.2s; }
+  .btn:hover { background:var(--ink); color:var(--paper); }
+  footer { border-top:1px solid var(--soft); padding:2rem 3rem; display:flex; justify-content:space-between; align-items:center; margin-top:4rem; }
+  footer span { font-size:0.6rem; color:var(--muted); letter-spacing:0.1em; }
+  footer a { font-size:0.6rem; color:var(--muted); text-decoration:none; letter-spacing:0.1em; transition:color 0.2s; }
+  footer a:hover { color:var(--ink); }
+
+  @media(max-width:768px){
+    nav{padding:1rem 1.5rem;} .nav-links{gap:1.2rem;} .nav-links a{font-size:0.55rem;}
+    .hero{padding:6rem 1.5rem 3rem;} .hero-cards{grid-template-columns:1fr;}
+    .page{padding:6rem 1.5rem 3rem;}
+    .about-grid,.ctc-grid{grid-template-columns:1fr;gap:3rem;}
+    .trabajos-grid{grid-template-columns:1fr;}
+    .catalog-header{flex-direction:column;align-items:flex-start;}
+    .pbar{padding:1rem 1.5rem;flex-direction:column;gap:1rem;}
+    footer{flex-direction:column;gap:1rem;text-align:center;}
+    .frow{grid-template-columns:1fr;}
+    .lb-inner{max-width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#" onclick="showPage('home');return false;">
+    <img class="nav-logo-img" src="assets/logo-kosmo.png" alt="KOSMO — estudio creativo de espacios">
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('rental');return false;">Rental</a></li>
+    <li><a href="#" onclick="showPage('ambientacion');return false;">Proyectos</a></li>
+    <li><a href="#" onclick="showPage('about');return false;">Nosotros</a></li>
+    <li><a href="#" onclick="showPage('contacto');return false;">Contacto</a></li>
+  </ul>
+</nav>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <h1 class="hero-title">Estudio<br><em>creativo</em><br>de espacios</h1>
+    <p class="hero-sub">Buenos Aires — Ambientaciones & Rental</p>
+    <div class="hero-cards">
+      <a class="hero-card" href="#" onclick="showPage('ambientacion');return false;">
+        <p class="card-tag">Servicio</p>
+        <h2 class="card-title">Ambientaciones</h2>
+        <p class="card-desc">Diseñamos y construimos espacios para producciones audiovisuales y eventos. Cada proyecto es único.</p>
+        <span class="card-cta">Conocé el servicio</span>
+      </a>
+      <a class="hero-card" href="#" onclick="showPage('rental');return false;">
+        <p class="card-tag">Catálogo</p>
+        <h2 class="card-title">Rental</h2>
+        <p class="card-desc">Más de 400 props disponibles — equipaje, bolsos, utilería de oficio y más. Armá tu presupuesto online.</p>
+        <span class="card-cta">Ver catálogo</span>
+      </a>
+    </div>
+  </section>
+  <footer><span>© 2025 KOSMO</span><a href="https://instagram.com" target="_blank">@kosmo.estudio</a></footer>
+</div>
+
+<!-- QUIÉNES SOMOS -->
+<div id="page-about" class="page">
+  <p class="breadcrumb" onclick="showPage('home')">← Inicio</p>
+  <div class="about-grid">
+    <div class="about-text">
+      <h2>Somos KOSMO</h2>
+      <p>Somos un estudio creativo de espacios basado en Buenos Aires. Trabajamos con productoras, agencias y marcas para crear ambientaciones y proveer utilería para producciones audiovisuales y eventos.</p>
+      <p>Nacimos como Marte Props, un rental de valijas, bolsos y accesorios para cine y publicidad. Hoy evolucionamos a KOSMO: sumamos el servicio de ambientación completa, manteniendo la misma dedicación y criterio estético de siempre.</p>
+      <p>Cada detalle importa. Cada espacio cuenta una historia.</p>
+    </div>
+    <div class="about-clients">
+      <h3>Algunos clientes</h3>
+      <ul class="client-list">
+        <li>ESPN</li><li>24/7</li><li>Lab House</li><li>Pampa Films</li><li>PRIMO</li><li>Oruga</li>
+      </ul>
+    </div>
+  </div>
+  <footer><span>© 2025 KOSMO</span><a href="https://instagram.com" target="_blank">@kosmo.estudio</a></footer>
+</div>
+
+<!-- AMBIENTACIONES -->
+<div id="page-ambientacion" class="page">
+  <p class="breadcrumb" onclick="showPage('home')">← Inicio</p>
+  <div class="ambientacion-hero">
+    <h2>Ambientamos<br><em>tu espacio</em></h2>
+    <p>Diseñamos y ejecutamos ambientaciones para producciones audiovisuales, publicidades y eventos corporativos. Desde la conceptualización hasta la instalación, nos encargamos de todo.</p>
+  </div>
+  <div class="trabajos-grid">
+    <div class="trabajo-card"><p class="trabajo-cliente">ESPN</p><h3>Ambientación deportiva</h3><p>Ambientación completa con utilería deportiva y elementos de set para producción de contenido de la señal.</p></div>
+    <div class="trabajo-card"><p class="trabajo-cliente">Eventos corporativos</p><h3>Pérgolas & estructuras</h3><p>Diseño y construcción de pérgolas de madera personalizadas para eventos al aire libre y producciones.</p></div>
+    <div class="trabajo-card"><p class="trabajo-cliente">Producciones audiovisuales</p><h3>Utilería & dressing</h3><p>Selección y coordinación de props, mobiliario y accesorios para series, publicidades y contenido digital.</p></div>
+  </div>
+  <div class="contacto-bloque">
+    <h3>¿Tenés un proyecto?</h3>
+    <p>Contanos de qué se trata y te respondemos con una propuesta. Trabajamos con productoras, agencias y marcas.</p>
+    <a class="btn" href="#" onclick="showPage('contacto');return false;">Escribinos</a>
+  </div>
+  <footer><span>© 2025 KOSMO</span><a href="https://instagram.com" target="_blank">@kosmo.estudio</a></footer>
+</div>
+
+<!-- RENTAL -->
+<div id="page-rental" class="page">
+  <p class="rental-back" onclick="showPage('home')">← Inicio</p>
+  <div class="rental-layout">
+    <aside class="rental-sidebar">
+      <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre..." oninput="filterCatalog()">
+      <div id="categoryFilters" class="cat-list"></div>
+      <img class="k-mark" src="assets/k-mark.png" alt="">
+    </aside>
+    <div class="rental-content">
+      <div id="catalogGrid" class="catalog-grid"><div class="loading">Cargando catálogo...</div></div>
+    </div>
+  </div>
+  <footer><span>© 2025 KOSMO</span><a href="https://instagram.com" target="_blank">@kosmo.estudio</a></footer>
+</div>
+
+<!-- CONTACTO -->
+<div id="page-contacto" class="page">
+  <p class="breadcrumb" onclick="showPage('home')">← Inicio</p>
+  <div class="ctc-grid">
+    <div class="ctc-info">
+      <h2>Hablemos</h2>
+      <p>Ya sea para una ambientación, una consulta sobre el catálogo o para contarnos de un proyecto, estamos disponibles.</p>
+      <p>Respondemos en menos de 24 horas.</p>
+      <div class="ctc-links">
+        <a href="mailto:kosmo.estudiocreativo@gmail.com">✉ kosmo.estudiocreativo@gmail.com</a>
+        <a href="https://instagram.com" target="_blank">◎ @kosmo.estudio</a>
+      </div>
+    </div>
+    <div>
+      <div class="fg"><label>Nombre</label><input type="text" id="ctcNombre" placeholder="Tu nombre"></div>
+      <div class="fg"><label>Mail</label><input type="email" id="ctcMail" placeholder="tu@mail.com"></div>
+      <div class="fg"><label>Productora / Agencia</label><input type="text" id="ctcProductora" placeholder="Opcional"></div>
+      <div class="fg"><label>Mensaje</label><textarea id="ctcMensaje" rows="5" placeholder="Contanos de qué se trata..."></textarea></div>
+      <button class="btn-send" id="btnCtc" onclick="sendContacto()">Enviar mensaje</button>
+    </div>
+  </div>
+  <footer><span>© 2025 KOSMO</span><a href="https://instagram.com" target="_blank">@kosmo.estudio</a></footer>
+</div>
+
+<!-- PRESUPUESTO BAR -->
+<div class="pbar" id="pbar">
+  <div class="pbar-info">
+    <span class="pbar-count" id="pbarCount">0 ítems</span>
+    <span class="pbar-total" id="pbarTotal">$0</span>
+  </div>
+  <div class="pbar-actions">
+    <button class="btn-clear" onclick="clearSelection()">Limpiar</button>
+    <button class="btn-ver-ppto" onclick="openModal()">Ver presupuesto →</button>
+  </div>
+</div>
+
+<!-- MODAL PRESUPUESTO -->
+<div class="overlay" id="overlay" onclick="closeOverlayOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalContent">
+      <h2>Tu presupuesto</h2>
+      <p class="modal-sub">Completá tus datos y te respondemos con la confirmación de disponibilidad y el detalle de pago. Precios por una semana (hasta 7 días). Semanas adicionales: +50%.</p>
+      <div class="modal-items" id="modalItems"></div>
+      <div class="modal-total-row">
+        <span class="modal-total-label">Total estimado (1 semana)</span>
+        <span class="modal-total-num" id="modalTotal">$0</span>
+      </div>
+      <p class="modal-note">Precio orientativo. La confirmación final incluye disponibilidad y condiciones de entrega.</p>
+      <div class="frow">
+        <div class="fg"><label>Nombre *</label><input type="text" id="fNombre" placeholder="Tu nombre"></div>
+        <div class="fg"><label>Mail *</label><input type="email" id="fMail" placeholder="tu@mail.com"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Productora / Agencia</label><input type="text" id="fProductora" placeholder="Opcional"></div>
+        <div class="fg"><label>Proyecto</label><input type="text" id="fProyecto" placeholder="Nombre del proyecto"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label>Fecha de retiro</label><input type="date" id="fRetiro"></div>
+        <div class="fg"><label>Fecha de devolución</label><input type="date" id="fDevolucion"></div>
+      </div>
+      <div class="fg"><label>Notas adicionales</label><textarea id="fNotas" rows="3" placeholder="¿Algún detalle extra?"></textarea></div>
+      <button class="btn-send" id="btnEnviar" onclick="sendPresupuesto()">Enviar solicitud de presupuesto</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLbOutside(event)">
+  <div class="lb-inner">
+    <button class="lb-close" onclick="closeLb()">✕</button>
+    <div class="lb-img-area">
+      <img id="lbImg" src="" alt="">
+      <button class="lb-nav prev" id="lbPrev" onclick="lbNav(-1)">‹</button>
+      <button class="lb-nav next" id="lbNext" onclick="lbNav(1)">›</button>
+    </div>
+    <div class="lb-thumbs" id="lbThumbs"></div>
+    <div class="lb-info">
+      <div>
+        <p class="lb-name" id="lbName"></p>
+        <p class="lb-meta" id="lbMeta"></p>
+      </div>
+      <div style="display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;">
+        <span class="lb-price" id="lbPrice"></span>
+        <button class="lb-add-btn" id="lbAddBtn" onclick="toggleFromLb()">+ Agregar al presupuesto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+emailjs.init('iLJJOWSuwCcw-u2uh');
+const SVC = 'service_r6acyzb';
+const TPL = 'template_k9p39s4';
+const CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS2A9ueV4VARt12AvP1tQehxQUbNUKUJUJva_mcjWw2NrJGgwvE_HIfSUSsTO7C3tqUv_Ay_o_UFhJx/pub?gid=783088536&single=true&output=csv';
+
+let allItems=[], filteredItems=[], selectedItems=new Map(), activeCat='Todos';
+let lbItem=null, lbIdx=0;
+
+// NAV
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.body.classList.toggle('theme-dark', id==='rental');
+  document.querySelectorAll('.nav-links a').forEach(a=>{
+    a.classList.toggle('nav-active', a.getAttribute('onclick').includes(`'${id}'`));
+  });
+  window.scrollTo(0,0);
+  if(id==='rental'&&allItems.length===0) loadCatalog();
+}
+
+// CSV
+function parseCSV(text){
+  // Parser que maneja correctamente saltos de línea dentro de celdas entre comillas
+  const rows=[];
+  let cur='', q=false, row=[];
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(ch==='"'){
+      if(q&&text[i+1]==='"'){cur+='"';i++;}
+      else q=!q;
+    } else if(ch===','&&!q){
+      row.push(cur); cur='';
+    } else if((ch==='\n'||ch==='\r')&&!q){
+      if(ch==='\r'&&text[i+1]==='\n') i++;
+      row.push(cur); cur='';
+      rows.push(row); row=[];
+    } else {
+      cur+=ch;
+    }
+  }
+  if(cur||row.length) { row.push(cur); rows.push(row); }
+
+  // Fila 0: título, Fila 1: encabezados, Fila 2+: datos
+  if(rows.length<3) return [];
+  return rows.slice(2).map(c=>{
+    const foto=c[7]?.trim()||'';
+    const fotos=foto?[foto]:[];
+    return {
+      codigo:c[0]?.trim()||'', categoria_web:c[1]?.trim()||'',
+      nombre:c[3]?.trim()||'', precio:parseInt(c[4]?.replace(/[^0-9]/g,'')||'0')||0,
+      medidas:(c[5]?.trim()||'').replace(/\n/g,' '), observaciones:c[6]?.trim()||'',
+      fotos, foto_url:foto, visible:(c[8]?.trim()||'SI').toUpperCase()
+    };
+  }).filter(i=>i.codigo&&i.nombre&&i.visible==='SI'&&i.precio>0);
+}
+
+async function loadCatalog(){
+  document.getElementById('catalogGrid').innerHTML='<div class="loading">Cargando catálogo...</div>';
+  try{
+    const res=await fetch(CSV);
+    const text=await res.text();
+    allItems=parseCSV(text);
+    filteredItems=[...allItems];
+    buildFilters(); renderCatalog();
+  }catch(e){
+    document.getElementById('catalogGrid').innerHTML='<div class="no-results">Error al cargar el catálogo. Intentá más tarde.</div>';
+  }
+}
+
+function buildFilters(){
+  const cats=[...new Set(allItems.map(i=>i.categoria_web))].filter(Boolean);
+  document.getElementById('categoryFilters').innerHTML=cats.map(c=>
+    `<button class="filter-btn" onclick="setCat('${c}')">${c}</button>`
+  ).join('');
+}
+
+function setCat(cat){
+  activeCat = (activeCat===cat) ? 'Todos' : cat;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.textContent===activeCat));
+  filterCatalog();
+}
+
+function filterCatalog(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  filteredItems=allItems.filter(i=>{
+    const mc=activeCat==='Todos'||i.categoria_web===activeCat;
+    const mq=!q||i.nombre.toLowerCase().includes(q)||i.categoria_web.toLowerCase().includes(q);
+    return mc&&mq;
+  });
+  renderCatalog();
+}
+
+function renderCatalog(){
+  const grid=document.getElementById('catalogGrid');
+  if(!filteredItems.length){grid.innerHTML='<div class="no-results">No se encontraron ítems.</div>';return;}
+  grid.innerHTML=filteredItems.map(item=>{
+    const sel=selectedItems.has(item.codigo);
+    const img=item.foto_url
+      ?`<img class="item-img" src="${item.foto_url}" alt="${item.nombre}" loading="lazy" onerror="this.outerHTML='<div class=\\'item-no-photo\\'>Sin foto</div>'">`
+      :`<div class="item-no-photo">Sin foto</div>`;
+    return `<div class="item-card ${sel?'selected':''}" data-cod="${item.codigo}">
+      <div class="item-img-wrap">
+        ${img}
+        <div class="item-img-actions">
+          <button class="iab iab-zoom" onclick="openLb('${item.codigo}')" title="Ver detalle">🔍</button>
+          <button class="iab iab-add ${sel?'added':''}" onclick="toggleItem('${item.codigo}',event)" title="${sel?'Quitar':'Agregar'}">${sel?'✓':'+'}</button>
+        </div>
+      </div>
+      <div class="item-info" onclick="openLb('${item.codigo}')">
+        <p class="item-cat">${item.categoria_web}</p>
+        <p class="item-name">${item.nombre}</p>
+        <p class="item-price">$${item.precio.toLocaleString('es-AR')} / semana</p>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleItem(cod,e){
+  if(e) e.stopPropagation();
+  const item=allItems.find(i=>i.codigo===cod);
+  if(!item) return;
+  if(selectedItems.has(cod)) selectedItems.delete(cod);
+  else selectedItems.set(cod,item);
+  updateBar();
+  const card=document.querySelector(`[data-cod="${cod}"]`);
+  if(card){
+    const sel=selectedItems.has(cod);
+    card.classList.toggle('selected',sel);
+    const btn=card.querySelector('.iab-add');
+    if(btn){btn.textContent=sel?'✓':'+';btn.classList.toggle('added',sel);}
+  }
+  if(lbItem&&lbItem.codigo===cod) updateLbBtn();
+}
+
+function clearSelection(){selectedItems.clear();updateBar();renderCatalog();}
+
+function updateBar(){
+  const n=selectedItems.size;
+  const t=[...selectedItems.values()].reduce((s,i)=>s+i.precio,0);
+  document.getElementById('pbarCount').textContent=`${n} ítem${n!==1?'s':''} seleccionado${n!==1?'s':''}`;
+  document.getElementById('pbarTotal').textContent=`$${t.toLocaleString('es-AR')}`;
+  document.getElementById('pbar').classList.toggle('visible',n>0);
+}
+
+// LIGHTBOX
+function openLb(cod){
+  lbItem=allItems.find(i=>i.codigo===cod);
+  if(!lbItem) return;
+  lbIdx=0; renderLb();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function renderLb(){
+  const fotos=lbItem.fotos.length?lbItem.fotos:[''];
+  document.getElementById('lbImg').src=fotos[lbIdx]||'';
+  document.getElementById('lbImg').alt=lbItem.nombre;
+  document.getElementById('lbName').textContent=lbItem.nombre;
+  document.getElementById('lbPrice').textContent=`$${lbItem.precio.toLocaleString('es-AR')} / sem`;
+  const meta=[lbItem.medidas,lbItem.observaciones].filter(Boolean).join(' · ');
+  document.getElementById('lbMeta').textContent=meta||lbItem.categoria_web;
+  const multi=fotos.length>1;
+  document.getElementById('lbPrev').style.display=multi?'flex':'none';
+  document.getElementById('lbNext').style.display=multi?'flex':'none';
+  const thumbsEl=document.getElementById('lbThumbs');
+  thumbsEl.style.display=multi?'flex':'none';
+  thumbsEl.innerHTML=fotos.map((f,i)=>
+    `<img class="lb-thumb ${i===lbIdx?'active':''}" src="${f}" onclick="setLbPhoto(${i})">`
+  ).join('');
+  updateLbBtn();
+}
+
+function setLbPhoto(i){
+  lbIdx=i;
+  document.getElementById('lbImg').src=lbItem.fotos[i];
+  document.querySelectorAll('.lb-thumb').forEach((t,j)=>t.classList.toggle('active',j===i));
+}
+
+function lbNav(d){
+  const total=lbItem.fotos.length;
+  lbIdx=(lbIdx+d+total)%total;
+  setLbPhoto(lbIdx);
+}
+
+function updateLbBtn(){
+  const btn=document.getElementById('lbAddBtn');
+  const sel=selectedItems.has(lbItem.codigo);
+  btn.textContent=sel?'✓ En presupuesto':'+ Agregar al presupuesto';
+  btn.classList.toggle('added',sel);
+}
+
+function toggleFromLb(){toggleItem(lbItem.codigo);}
+
+function closeLb(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+function closeLbOutside(e){if(e.target===document.getElementById('lightbox'))closeLb();}
+
+// MODAL
+function openModal(){
+  const items=[...selectedItems.values()];
+  const total=items.reduce((s,i)=>s+i.precio,0);
+  document.getElementById('modalItems').innerHTML=items.map(item=>`
+    <div class="modal-row">
+      <span class="modal-row-name">${item.nombre}</span>
+      <span class="modal-row-price">$${item.precio.toLocaleString('es-AR')}</span>
+      <button class="modal-row-rm" onclick="removeFromModal('${item.codigo}')">✕</button>
+    </div>`).join('');
+  document.getElementById('modalTotal').textContent=`$${total.toLocaleString('es-AR')}`;
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function removeFromModal(cod){
+  selectedItems.delete(cod); updateBar();
+  if(!selectedItems.size){closeModal();renderCatalog();return;}
+  openModal(); renderCatalog();
+}
+
+function closeModal(){document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';}
+function closeOverlayOutside(e){if(e.target===document.getElementById('overlay'))closeModal();}
+
+// WEEK + PRICE CALCULATOR
+function calcWeeksAndTotal(retiroVal,devolucionVal,baseTotal){
+  if(!retiroVal||!devolucionVal) return {semanas:1,total:baseTotal,label:'1 semana (fechas no especificadas)'};
+  const d1=new Date(retiroVal),d2=new Date(devolucionVal);
+  const dias=Math.max(1,Math.ceil((d2-d1)/(1000*60*60*24)));
+  const semanas=Math.ceil(dias/7);
+  const total=semanas===1?baseTotal:baseTotal+(baseTotal*0.5*(semanas-1));
+  const label=semanas===1?`1 semana (${dias} días)`:`${semanas} semanas (${dias} días) — base + ${semanas-1}x50%`;
+  return {semanas,total,label};
+}
+
+// SEND PRESUPUESTO
+async function sendPresupuesto(){
+  const nombre=document.getElementById('fNombre').value.trim();
+  const mail=document.getElementById('fMail').value.trim();
+  if(!nombre||!mail){alert('Por favor completá nombre y mail.');return;}
+  const items=[...selectedItems.values()];
+  const baseTotal=items.reduce((s,i)=>s+i.precio,0);
+  const retiroVal=document.getElementById('fRetiro').value;
+  const devolucionVal=document.getElementById('fDevolucion').value;
+  const {semanas,total,label}=calcWeeksAndTotal(retiroVal,devolucionVal,baseTotal);
+  const lista=items.map(i=>`[${i.codigo}] ${i.nombre} — $${i.precio.toLocaleString('es-AR')}/sem`).join('\n');
+  const btn=document.getElementById('btnEnviar');
+  btn.disabled=true; btn.textContent='Enviando...';
+  try{
+    await emailjs.send(SVC,TPL,{
+      nombre, mail,
+      productora:document.getElementById('fProductora').value||'—',
+      proyecto:document.getElementById('fProyecto').value||'—',
+      retiro:document.getElementById('fRetiro').value||'—',
+      devolucion:document.getElementById('fDevolucion').value||'—',
+      items:lista,
+      total:`$${total.toLocaleString('es-AR')} (${label})`,
+      notas:document.getElementById('fNotas').value||'—',
+    });
+    document.getElementById('modalContent').innerHTML=`
+      <div class="send-ok">
+        <h3>¡Presupuesto enviado!</h3>
+        <p>Recibimos tu solicitud y te vamos a responder a <strong>${mail}</strong><br>en menos de 24 horas con la confirmación de disponibilidad.</p>
+        <button class="btn" onclick="closeModal();clearSelection();" style="margin-top:2rem;">Volver al catálogo</button>
+      </div>`;
+  }catch(err){
+    btn.disabled=false; btn.textContent='Enviar solicitud de presupuesto';
+    alert('Hubo un error al enviar. Escribinos a kosmo.estudiocreativo@gmail.com');
+  }
+}
+
+// SEND CONTACTO
+async function sendContacto(){
+  const nombre=document.getElementById('ctcNombre').value.trim();
+  const mail=document.getElementById('ctcMail').value.trim();
+  const msg=document.getElementById('ctcMensaje').value.trim();
+  if(!nombre||!mail||!msg){alert('Por favor completá nombre, mail y mensaje.');return;}
+  const btn=document.getElementById('btnCtc');
+  btn.disabled=true; btn.textContent='Enviando...';
+  try{
+    await emailjs.send(SVC,'template_vukca4c',{
+      nombre, mail,
+      productora:document.getElementById('ctcProductora').value||'--',
+      mensaje:msg,
+    });
+    btn.textContent='¡Mensaje enviado!';
+    btn.style.background='var(--accent)'; btn.style.color='var(--ink)';
+    ['ctcNombre','ctcMail','ctcProductora','ctcMensaje'].forEach(id=>document.getElementById(id).value='');
+    setTimeout(()=>{btn.disabled=false;btn.textContent='Enviar mensaje';btn.style.background='';btn.style.color='';},4000);
+  }catch(err){
+    btn.disabled=false; btn.textContent='Enviar mensaje';
+    alert('Hubo un error. Escribinos a kosmo.estudiocreativo@gmail.com');
+  }
+}
+</script>
+</body>
+</html>
