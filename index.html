@@ -26,17 +26,18 @@
   body.theme-dark {
     background-color: var(--dk-bg);
     background-image: url('assets/fondo-web.jpg');
-    background-size: 130% auto;
-    background-position: center 30%;
+    background-size: cover;
+    background-position: center 40%;
+    background-attachment: fixed;
     background-repeat: no-repeat;
     color: var(--dk-ink);
-    animation: bgdrift 50s ease-in-out infinite alternate;
+    animation: bgdrift 60s ease-in-out infinite alternate;
   }
   body.theme-dark::after {
     content:''; position:fixed; inset:0; z-index:1; pointer-events:none;
-    background:linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.55));
+    background:linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.22));
   }
-  @keyframes bgdrift { from{background-position:center 25%;} to{background-position:center 38%;} }
+  @keyframes bgdrift { from{background-position:center 35%;} to{background-position:center 48%;} }
 
   /* NAV */
   nav { position: fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:1.2rem 3rem; background:var(--paper); border-bottom:1px solid var(--soft); transition:background 0.4s ease, border-color 0.4s ease; }
