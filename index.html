@@ -118,10 +118,11 @@
   .search-input { font-family:'Systemia',sans-serif; font-size:0.68rem; letter-spacing:0.02em; border:1px solid var(--dk-border); background:transparent; padding:0.75rem 1rem; width:100%; outline:none; color:var(--dk-ink); transition:border-color 0.2s; }
   .search-input:focus { border-color:var(--c-rental); }
   .search-input::placeholder { color:var(--dk-muted); }
-  .cat-list { display:flex; flex-direction:column; gap:1.05rem; }
-  .filter-btn { font-family:'Systemia',sans-serif; font-size:0.85rem; text-align:left; border:none; background:transparent; padding:0; cursor:pointer; color:var(--dk-muted); transition:color 0.25s ease, transform 0.25s ease; }
+  .cat-list { display:flex; flex-direction:column; gap:1.2rem; }
+  .filter-btn { font-family:'Systemia',sans-serif; font-weight:500; font-size:1.05rem; text-align:left; border:none; background:transparent; padding:0; cursor:pointer; color:var(--dk-muted); transition:color 0.25s ease, transform 0.25s ease; }
+  .filter-btn.ver-todos { font-weight:700; color:var(--dk-ink); padding-bottom:1rem; border-bottom:1px solid var(--dk-border); }
   .filter-btn:hover { color:var(--dk-ink); transform:translateX(4px); }
-  .filter-btn.active { color:var(--c-rental); font-weight:500; transform:translateX(4px); }
+  .filter-btn.active { color:var(--c-rental); font-weight:700; transform:translateX(4px); }
   .k-mark { width:44px; height:auto; opacity:0.85; margin-top:0.5rem; animation:kspin 26s linear infinite; }
   @keyframes kspin { to { transform:rotate(360deg); } }
 
@@ -510,14 +511,21 @@ async function loadCatalog(){
 
 function buildFilters(){
   const cats=[...new Set(allItems.map(i=>i.categoria_web))].filter(Boolean);
-  document.getElementById('categoryFilters').innerHTML=cats.map(c=>
-    `<button class="filter-btn" onclick="setCat('${c}')">${c}</button>`
-  ).join('');
+  const verTodos=`<button class="filter-btn ver-todos" data-cat="Todos" onclick="resetToAll()">Ver todos</button>`;
+  const rest=cats.map(c=>`<button class="filter-btn" data-cat="${c}" onclick="setCat('${c}')">${c}</button>`).join('');
+  document.getElementById('categoryFilters').innerHTML=verTodos+rest;
 }
 
 function setCat(cat){
   activeCat = (activeCat===cat) ? 'Todos' : cat;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.textContent===activeCat));
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===activeCat));
+  filterCatalog();
+}
+
+function resetToAll(){
+  document.getElementById('searchInput').value='';
+  activeCat='Todos';
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat==='Todos'));
   filterCatalog();
 }
 
