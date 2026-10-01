@@ -86,10 +86,23 @@
   .hero-card:hover .card-cta::after { transform:translateX(4px); }
 
   /* ABOUT */
-  .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:6rem; max-width:1000px; margin:4rem 0; }
-  .about-text h2 { font-family:'Systemia',sans-serif; font-size:3rem; font-weight:300; margin-bottom:2rem; line-height:1.1; }
-  .about-text p { font-size:0.7rem; line-height:2; color:var(--muted); margin-bottom:1.5rem; }
-  .about-clients h3 { font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--muted); margin-bottom:2rem; }
+  /* NOSOTRAS — card clara sobre fondo oscuro */
+  #page-about { padding-top:6.5rem; }
+  .about-card { background:var(--paper); padding:4.2rem 3.8rem; width:100%; max-width:1400px; position:relative; }
+  .about-card, .about-card * { font-family:'Systemia',sans-serif; }
+  .k-mark-corner { position:absolute; top:2.4rem; right:2.6rem; width:42px; height:auto; filter:invert(1); animation:kspin 26s linear infinite; }
+  .about-grid-new { display:grid; grid-template-columns:0.85fr 1.6fr; gap:3.5rem; align-items:center; }
+  .about-title { font-weight:700; text-transform:uppercase; color:var(--c-rental); font-size:2.6rem; letter-spacing:0.01em; }
+  .about-bio { font-size:0.92rem; line-height:1.9; color:var(--ink); max-width:480px; margin-bottom:2.2rem; }
+  .team-photos { display:flex; gap:1.2rem; }
+  .team-photos figure { width:50%; margin:0; }
+  .team-photos img { width:100%; aspect-ratio:4/5; object-fit:cover; display:block; }
+  @media(max-width:900px){
+    .about-grid-new{grid-template-columns:1fr; gap:1.8rem;}
+    .about-card{padding:2.5rem;}
+    .team-photos{flex-direction:column;}
+    .team-photos figure{width:100%;}
+  }
   .client-list { list-style:none; display:flex; flex-direction:column; gap:0.8rem; }
   .client-list li { font-family:'Systemia',sans-serif; font-size:1.4rem; font-weight:300; border-bottom:1px solid var(--soft); padding-bottom:0.8rem; color:var(--muted); }
 
@@ -307,21 +320,21 @@
   <footer><span>© 2025 KOSMO</span><a href="https://instagram.com" target="_blank">@kosmo.estudio</a></footer>
 </div>
 
-<!-- QUIÉNES SOMOS -->
+<!-- NOSOTRAS -->
 <div id="page-about" class="page">
-  <p class="breadcrumb" onclick="showPage('home')">← Inicio</p>
-  <div class="about-grid">
-    <div class="about-text">
-      <h2>Somos KOSMO</h2>
-      <p>Somos un estudio creativo de espacios basado en Buenos Aires. Trabajamos con productoras, agencias y marcas para crear ambientaciones y proveer utilería para producciones audiovisuales y eventos.</p>
-      <p>Nacimos como Marte Props, un rental de valijas, bolsos y accesorios para cine y publicidad. Hoy evolucionamos a KOSMO: sumamos el servicio de ambientación completa, manteniendo la misma dedicación y criterio estético de siempre.</p>
-      <p>Cada detalle importa. Cada espacio cuenta una historia.</p>
-    </div>
-    <div class="about-clients">
-      <h3>Algunos clientes</h3>
-      <ul class="client-list">
-        <li>ESPN</li><li>24/7</li><li>Lab House</li><li>Pampa Films</li><li>PRIMO</li><li>Oruga</li>
-      </ul>
+  <div class="about-card">
+    <img class="k-mark-corner" src="assets/k-mark.png" alt="">
+    <div class="about-grid-new">
+      <div class="about-title-col">
+        <h2 class="about-title">Nosotras</h2>
+      </div>
+      <div class="about-right-col">
+        <p class="about-bio">Somos Kosmo, un estudio dedicado a la dirección de arte, la ambientación de eventos, las realizaciones, las activaciones de marca y el rental de props. Nos gusta acompañar cada proyecto de punta a punta, con la misma dedicación con la que elegimos cada objeto de nuestra colección.</p>
+        <div class="team-photos">
+          <figure><img src="assets/team-yamila.jpg" alt="Yamila Kohan"></figure>
+          <figure><img src="assets/team-edna.jpg" alt="Edna Mostyszczer"></figure>
+        </div>
+      </div>
     </div>
   </div>
   <footer><span>© 2025 KOSMO</span><a href="https://instagram.com" target="_blank">@kosmo.estudio</a></footer>
@@ -471,7 +484,7 @@ let lbItem=null, lbIdx=0;
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  document.body.classList.toggle('theme-dark', id==='rental' || id==='contacto');
+  document.body.classList.toggle('theme-dark', id==='rental' || id==='contacto' || id==='about');
   document.querySelectorAll('.nav-links a').forEach(a=>{
     a.classList.toggle('nav-active', a.getAttribute('onclick').includes(`'${id}'`));
   });
